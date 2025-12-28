@@ -1,0 +1,12 @@
+{
+  "products": [
+    {
+      "name": "14.1-inch Laptop",
+      "quantity": 1
+    },
+    {
+      "name": "Build your own cheap computer",
+      "quantity": 2
+    }
+  ]
+}

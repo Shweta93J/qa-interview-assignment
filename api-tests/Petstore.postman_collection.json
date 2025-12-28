@@ -1,0 +1,176 @@
+{
+  "info": {
+    "name": "Petstore - POST/GET Pet",
+    "_postman_id": "11111111-2222-3333-4444-555555555555",
+    "description": "Simple API automation for Swagger Petstore: create a pet, then fetch it. Includes basic negative tests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "POST Create Pet (positive)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "https://petstore.swagger.io/v2/pet",
+          "protocol": "https",
+          "host": [
+            "petstore",
+            "swagger",
+            "io"
+          ],
+          "path": [
+            "v2",
+            "pet"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"id\": 0, \"category\": {\"id\": 0, \"name\": \"demo\"}, \"name\": \"QA-Demo-Pet\", \"photoUrls\": [\"https://example.com/pet.png\"], \"tags\": [{\"id\": 1, \"name\": \"tag1\"}], \"status\": \"available\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response has an id', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property('id');",
+              "  pm.environment.set('petId', json.id);",
+              "});",
+              "",
+              "pm.test('Name matches request', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json.name).to.eql('QA-Demo-Pet');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET Pet by Id (positive)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://petstore.swagger.io/v2/pet/{{petId}}",
+          "protocol": "https",
+          "host": [
+            "petstore",
+            "swagger",
+            "io"
+          ],
+          "path": [
+            "v2",
+            "pet",
+            "{{petId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Fetched pet id matches the stored one', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(String(json.id)).to.eql(String(pm.environment.get('petId')));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET Pet by Id (negative - not found)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://petstore.swagger.io/v2/pet/999999999999",
+          "protocol": "https",
+          "host": [
+            "petstore",
+            "swagger",
+            "io"
+          ],
+          "path": [
+            "v2",
+            "pet",
+            "999999999999"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 404 for non-existing pet', function () {",
+              "  pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST Create Pet (negative - invalid body)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "https://petstore.swagger.io/v2/pet",
+          "protocol": "https",
+          "host": [
+            "petstore",
+            "swagger",
+            "io"
+          ],
+          "path": [
+            "v2",
+            "pet"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"id\": \"bad_id\", \"name\": 123}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Should return 400/500 depending on upstream validation', function () {",
+              "  pm.expect([400, 500]).to.include(pm.response.code);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
